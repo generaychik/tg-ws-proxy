@@ -34,7 +34,7 @@ jobs:
         run: pyinstaller packaging/windows.spec --noconfirm
 
       - name: Save UPX build copy
-        run: Copy-Item dist/TgWsProxy.exe dist/TgWsProxy-upx.exe -Force
+        run: Copy-Item dist/TgWsProxy.exe dist/TgWsProxy-compressed.exe -Force
 
       - name: Build EXE without UPX
         shell: pwsh
@@ -50,19 +50,13 @@ jobs:
           pyinstaller $specOut --noconfirm --clean
           Remove-Item $specOut -Force
 
-      - name: Rename non-UPX artifact
-        run: Rename-Item -Path dist/TgWsProxy.exe -NewName TgWsProxy-no-upx.exe
-
-      - name: Restore default artifact name
-        run: Copy-Item dist/TgWsProxy-upx.exe dist/TgWsProxy.exe -Force
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: TgWsProxy
           path: |
             dist/TgWsProxy.exe
-            dist/TgWsProxy-no-upx.exe
+            dist/TgWsProxy-compressed.exe
 
   build-win7:
     runs-on: windows-latest
@@ -118,8 +112,8 @@ jobs:
           body: |
             ## TG WS Proxy ${{ github.event.inputs.version }}
           files: |
+            dist/TgWsProxy-compressed.exe
             dist/TgWsProxy.exe
-            dist/TgWsProxy-unstripped.exe
             dist/TgWsProxy-win7.exe
           draft: false
           prerelease: false
