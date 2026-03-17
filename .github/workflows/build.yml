@@ -2,6 +2,11 @@ name: Build & Release
 on:
   workflow_dispatch:
     inputs:
+      create_release:
+        description: 'Create a GitHub Release?'
+        type: boolean
+        required: true
+        default: false
       version:
         description: "Release version tag (e.g. v1.0.0)"
         required: true
@@ -71,6 +76,7 @@ jobs:
   release:
     needs: [build, build-win7]
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.create_release == 'true' }}
     steps:
       - name: Download main build
         uses: actions/download-artifact@v4
