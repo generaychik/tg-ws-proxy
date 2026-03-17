@@ -45,9 +45,14 @@ jobs:
           Copy-Item -Force .\build\releasew\* $dest
         shell: pwsh
 
-      - name: Verify bootloader location and hash
+      - name: Verify bootloader hashes
         run: |
-          python -c "import PyInstaller, pathlib, hashlib; p=pathlib.Path(PyInstaller.__file__).parent/'bootloader'/'Windows-64bit-intel'/'run.exe'; print(p); print(hashlib.sha256(p.read_bytes()).hexdigest())"
+          python -c "import PyInstaller, pathlib, hashlib; built=pathlib.Path(r'_pyinstaller_src/bootloader/build/releasew/runw.exe'); inst=pathlib.Path(PyInstaller.__file__).parent/'bootloader'/'Windows-64bit-intel'/'runw.exe'; print(built); print(inst); print(hashlib.sha256(built.read_bytes()).hexdigest()); print(hashlib.sha256(inst.read_bytes()).hexdigest())"
+        shell: pwsh
+
+      - name: Verify bootloader strings
+        run: |
+          python -c "from pathlib import Path; data=Path(r'_pyinstaller_src/bootloader/build/releasew/runw.exe').read_bytes(); print(b'TgWsProxy' in data, b'PyInstaller' in data)"
         shell: pwsh
       - name: Build EXE with PyInstaller
         run: pyinstaller packaging/windows.spec --noconfirm --log-level=DEBUG
